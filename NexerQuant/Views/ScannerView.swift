@@ -1,0 +1,2 @@
+import SwiftUI
+struct ScannerView:View{@EnvironmentObject var s:TradingStore;var body:some View{NavigationStack{List{s.scans.isEmpty ? AnyView(Text("Run Scan Market from Auto.")) : AnyView(ForEach(s.scans){x in VStack(alignment:.leading){HStack{Text(x.asset.symbol).bold();Text(x.asset.assetClass.rawValue).font(.caption).foregroundStyle(.secondary);Spacer();Text("\(x.score)/100").bold().foregroundStyle(x.score>=s.settings.minimumScore ? .green:.primary)};Text(x.reason).font(.caption).foregroundStyle(.secondary)}})}.navigationTitle("Market Scanner")}}}
