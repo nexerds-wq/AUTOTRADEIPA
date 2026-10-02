@@ -2,54 +2,129 @@ import Foundation
 import SwiftUI
 
 @MainActor final class TradingStore: ObservableObject {
- @Published var settings=StrategySettings(); @Published var cash=10000.0; @Published var positions:[Position]=[]; @Published var trades:[Trade]=[]; @Published var scans:[ScanResult]=[]; @Published var isScanning=false; @Published var apiKey=""
- let data=MarketDataService()
- let universe:[Asset] = [
-  .init(symbol:"SPY",name:"S&P 500 ETF",assetClass:.etfs),.init(symbol:"QQQ",name:"Nasdaq 100 ETF",assetClass:.etfs),.init(symbol:"IWM",name:"Russell 2000 ETF",assetClass:.etfs),
-  .init(symbol:"XLK",name:"Technology Select Sector ETF",assetClass:.etfs),.init(symbol:"SMH",name:"Semiconductor ETF",assetClass:.etfs),.init(symbol:"DIA",name:"Dow Jones ETF",assetClass:.etfs),
-  .init(symbol:"AAPL",name:"Apple",assetClass:.stocks),.init(symbol:"MSFT",name:"Microsoft",assetClass:.stocks),.init(symbol:"NVDA",name:"NVIDIA",assetClass:.stocks),.init(symbol:"AMD",name:"AMD",assetClass:.stocks),.init(symbol:"AMZN",name:"Amazon",assetClass:.stocks),.init(symbol:"GOOGL",name:"Alphabet",assetClass:.stocks),.init(symbol:"META",name:"Meta",assetClass:.stocks),.init(symbol:"TSLA",name:"Tesla",assetClass:.stocks),.init(symbol:"AVGO",name:"Broadcom",assetClass:.stocks),.init(symbol:"NFLX",name:"Netflix",assetClass:.stocks),.init(symbol:"ORCL",name:"Oracle",assetClass:.stocks),.init(symbol:"CRM",name:"Salesforce",assetClass:.stocks),
-  .init(symbol:"BTC/USD",name:"Bitcoin",assetClass:.crypto),.init(symbol:"ETH/USD",name:"Ethereum",assetClass:.crypto),.init(symbol:"SOL/USD",name:"Solana",assetClass:.crypto),
-  .init(symbol:"EUR/USD",name:"Euro / Dollar",assetClass:.forex),.init(symbol:"GBP/USD",name:"Pound / Dollar",assetClass:.forex),.init(symbol:"USD/JPY",name:"Dollar / Yen",assetClass:.forex),.init(symbol:"USD/CAD",name:"Dollar / Canadian Dollar",assetClass:.forex)
- ]
- var equity:Double { cash + positions.reduce(0){$0+$1.value} }
- func scan() async { isScanning=true; defer{isScanning=false}; var r:[ScanResult]=[]
-  for a in universe { if let c=try? await data.candles(symbol:a.symbol,apiKey:apiKey), c.count>200, let e200=Indicators.ema(c,settings.slowMA), let e50=Indicators.ema(c,settings.fastMA), let rs=Indicators.rsi(c) { let p=c.last!; let look=min(c.count-1,252); let mom=(p/c[c.count-1-look]-1)*100; let mac=Indicators.macd(c); var score=0; if mom>0{score+=30}; if p>e200{score+=25}; if e50>e200{score+=15}; if rs>=50 && rs<=70{score+=10}; if let m=mac, m.0>m.1{score+=10}; if mom>10{score+=10}; let why="Momentum \(String(format:"%.1f",mom))% • RSI \(String(format:"%.0f",rs)) • \(p>e200 ? "Above" : "Below") 200 EMA"; r.append(.init(asset:a,price:p,score:score,momentum:mom,above200:p>e200,rsi:rs,reason:why)) } }
-  scans=r.sorted{$0.score>$1.score}; if settings.autoEnabled { autoTrade() }
- }
+    @Published var settings = StrategySettings()
+    @Published var cash = 10000.0
+    @Published var positions:[Position] = []
+    @Published var trades:[Trade] = []
+    @Published var scans:[ScanResult] = []
+    @Published var isScanning = false
+    @Published var apiKey = ""
 
- // Adaptive paper-trading decision engine. The strategy can vary position size based on
- // setup quality, but hard portfolio/risk limits remain outside its control.
- func autoTrade(){
-  let candidates = scans.filter { $0.score >= settings.minimumScore && $0.momentum > 0 && $0.above200 && $0.rsi < 75 }
-  for s in candidates {
-   guard positions.count < settings.maxPositions, !positions.contains(where:{$0.symbol==s.asset.symbol}), cash > 0 else { continue }
+    let data = MarketDataService()
 
-   // Convert the strategy evidence into a confidence value from 0...1.
-   let scoreConfidence = min(1.0, max(0.0, Double(s.score - settings.minimumScore + 20) / 40.0))
-   let momentumConfidence = min(1.0, max(0.0, s.momentum / 30.0))
-   let rsiConfidence = max(0.0, 1.0 - abs(s.rsi - 60.0) / 20.0)
-   let confidence = min(1.0, max(0.0, scoreConfidence*0.55 + momentumConfidence*0.30 + rsiConfidence*0.15))
+    let universe:[Asset] = [
+        .init(symbol:"SPY",name:"S&P 500 ETF",assetClass:.etfs), .init(symbol:"QQQ",name:"Nasdaq 100 ETF",assetClass:.etfs), .init(symbol:"IWM",name:"Russell 2000 ETF",assetClass:.etfs),
+        .init(symbol:"DIA",name:"Dow Jones ETF",assetClass:.etfs), .init(symbol:"XLK",name:"Technology ETF",assetClass:.etfs), .init(symbol:"XLF",name:"Financial ETF",assetClass:.etfs),
+        .init(symbol:"XLE",name:"Energy ETF",assetClass:.etfs), .init(symbol:"XLV",name:"Health Care ETF",assetClass:.etfs), .init(symbol:"XLI",name:"Industrial ETF",assetClass:.etfs),
+        .init(symbol:"XLY",name:"Consumer Discretionary ETF",assetClass:.etfs), .init(symbol:"XLP",name:"Consumer Staples ETF",assetClass:.etfs), .init(symbol:"XLU",name:"Utilities ETF",assetClass:.etfs),
+        .init(symbol:"SMH",name:"Semiconductor ETF",assetClass:.etfs), .init(symbol:"VTI",name:"Total US Market ETF",assetClass:.etfs), .init(symbol:"VEA",name:"Developed Markets ETF",assetClass:.etfs),
+        .init(symbol:"VWO",name:"Emerging Markets ETF",assetClass:.etfs), .init(symbol:"TLT",name:"20+ Year Treasury ETF",assetClass:.etfs), .init(symbol:"GLD",name:"Gold ETF",assetClass:.etfs),
+        .init(symbol:"AAPL",name:"Apple",assetClass:.stocks), .init(symbol:"MSFT",name:"Microsoft",assetClass:.stocks), .init(symbol:"NVDA",name:"NVIDIA",assetClass:.stocks),
+        .init(symbol:"AMZN",name:"Amazon",assetClass:.stocks), .init(symbol:"GOOGL",name:"Alphabet",assetClass:.stocks), .init(symbol:"META",name:"Meta",assetClass:.stocks),
+        .init(symbol:"AVGO",name:"Broadcom",assetClass:.stocks), .init(symbol:"AMD",name:"AMD",assetClass:.stocks), .init(symbol:"NFLX",name:"Netflix",assetClass:.stocks),
+        .init(symbol:"ORCL",name:"Oracle",assetClass:.stocks), .init(symbol:"CRM",name:"Salesforce",assetClass:.stocks), .init(symbol:"COST",name:"Costco",assetClass:.stocks),
+        .init(symbol:"JPM",name:"JPMorgan",assetClass:.stocks), .init(symbol:"V",name:"Visa",assetClass:.stocks), .init(symbol:"MA",name:"Mastercard",assetClass:.stocks),
+        .init(symbol:"WMT",name:"Walmart",assetClass:.stocks), .init(symbol:"HD",name:"Home Depot",assetClass:.stocks), .init(symbol:"LLY",name:"Eli Lilly",assetClass:.stocks),
+        .init(symbol:"UNH",name:"UnitedHealth",assetClass:.stocks), .init(symbol:"XOM",name:"Exxon Mobil",assetClass:.stocks), .init(symbol:"CAT",name:"Caterpillar",assetClass:.stocks),
+        .init(symbol:"GE",name:"GE Aerospace",assetClass:.stocks), .init(symbol:"IBM",name:"IBM",assetClass:.stocks), .init(symbol:"CSCO",name:"Cisco",assetClass:.stocks),
+        .init(symbol:"ADBE",name:"Adobe",assetClass:.stocks), .init(symbol:"INTC",name:"Intel",assetClass:.stocks), .init(symbol:"QCOM",name:"Qualcomm",assetClass:.stocks)
+    ]
 
-   // Better setups can receive more capital. Weak qualifying setups stay small.
-   // maxPositionPct is still an absolute safety ceiling.
-   let adaptivePct = settings.minAdaptivePositionPct + (settings.maxPositionPct-settings.minAdaptivePositionPct)*confidence
-   let maxValue = min(equity*settings.maxPositionPct/100, equity*adaptivePct/100)
+    var equity:Double { cash + positions.reduce(0) { $0 + $1.value } }
 
-   // Stop distance adapts slightly to setup quality while never removing the stop.
-   let stopPct = 0.045 + (1.0-confidence)*0.025
-   let stop = s.price*(1.0-stopPct)
-   let riskBudget = equity*settings.riskPct/100
-   let qtyByRisk = riskBudget/max(0.01,s.price-stop)
-   let qtyByCapital = maxValue/s.price
-   let qty = min(qtyByRisk,qtyByCapital)
-   let cost = qty*s.price
-   guard qty>0, cost<=cash else { continue }
+    func scan() async {
+        isScanning = true
+        defer { isScanning = false }
+        var results:[ScanResult] = []
 
-   cash-=cost
-   positions.append(.init(id:UUID(),symbol:s.asset.symbol,quantity:qty,entry:s.price,current:s.price,stop:stop,opened:Date()))
-   let decision="Adaptive confidence \(Int(confidence*100))% • allocation \(String(format:"%.1f",adaptivePct))% • \(s.reason)"
-   trades.insert(.init(id:UUID(),symbol:s.asset.symbol,side:"ADAPTIVE BUY",quantity:qty,price:s.price,date:Date(),reason:decision),at:0)
-  }
- }
- func reset(){cash=settings.startingCash;positions=[];trades=[]}
+        for asset in universe {
+            guard let m = try? await data.series(symbol: asset.symbol), m.closes.count >= 252 else { continue }
+            let c = m.closes
+            let p = m.last
+            guard p > 0, let ma200 = Indicators.sma(c, 200) else { continue }
+            let mom12 = (p / c[c.count - 252] - 1) * 100
+            let mom6 = (p / c[c.count - 126] - 1) * 100
+            let above200 = p > ma200
+            let recentHigh = c.dropLast().suffix(63).max() ?? p
+            let breakout = p >= recentHigh
+            let returns = zip(c.suffix(61).dropFirst(), c.suffix(61)).map { ($0 / $1) - 1 }
+            let mean = returns.isEmpty ? 0 : returns.reduce(0,+) / Double(returns.count)
+            let variance = returns.isEmpty ? 0 : returns.reduce(0) { $0 + pow($1-mean,2) } / Double(returns.count)
+            let volatility = sqrt(variance) * sqrt(252) * 100
+
+            var score = 0
+            if above200 { score += 30 }
+            if mom12 > 0 { score += 25 }
+            if mom6 > 0 { score += 20 }
+            if mom6 > mom12 / 2 { score += 10 }
+            if breakout { score += 10 }
+            if volatility < 45 { score += 5 }
+
+            let reason = "12M \(String(format:"%.1f",mom12))% • 6M \(String(format:"%.1f",mom6))% • \(above200 ? "above" : "below") 200D • vol \(String(format:"%.1f",volatility))%"
+            results.append(.init(asset:asset,price:p,score:score,momentum12:mom12,momentum6:mom6,above200:above200,volatility:volatility,breakout:breakout,reason:reason))
+        }
+
+        scans = results.sorted { $0.score == $1.score ? $0.momentum12 > $1.momentum12 : $0.score > $1.score }
+        markPositions()
+        if settings.autoEnabled { autoTrade() }
+    }
+
+    private func markPositions() {
+        for i in positions.indices {
+            if let quote = scans.first(where: { $0.asset.symbol == positions[i].symbol }) {
+                positions[i].current = quote.price
+                positions[i].peak = max(positions[i].peak, quote.price)
+            }
+        }
+    }
+
+    func autoTrade() {
+        // Systematic paper-trading model: diversified trend + dual momentum.
+        // No fixed three-symbol list and no fixed $1,000 order size.
+        let eligible = scans.filter { $0.above200 && $0.momentum12 > 0 && $0.momentum6 > 0 && $0.score >= 65 }
+        let targetCount = min(8, max(3, eligible.count))
+        let targetSymbols = Set(eligible.prefix(targetCount).map { $0.asset.symbol })
+
+        // Exit broken trends, trailing-stop hits, or assets that fall out of the ranked portfolio.
+        for position in positions.reversed() {
+            guard let quote = scans.first(where: { $0.asset.symbol == position.symbol }) else { continue }
+            let trailingStop = position.peak * 0.90
+            if !quote.above200 || quote.momentum6 <= 0 || quote.price <= max(position.stop, trailingStop) || !targetSymbols.contains(position.symbol) {
+                sell(symbol: position.symbol, price: quote.price, reason: "Trend/rank exit")
+            }
+        }
+
+        guard !eligible.isEmpty else { return }
+        let portfolioValue = max(equity, 1)
+        let allocation = min(0.18, 0.90 / Double(targetCount))
+
+        for signal in eligible.prefix(targetCount) {
+            guard !positions.contains(where: { $0.symbol == signal.asset.symbol }) else { continue }
+            let desiredValue = portfolioValue * allocation
+            let spend = min(cash, desiredValue)
+            guard spend >= 25, signal.price > 0 else { continue }
+            let qty = spend / signal.price
+            let stop = signal.price * 0.92
+            cash -= spend
+            positions.append(.init(id:UUID(),symbol:signal.asset.symbol,quantity:qty,entry:signal.price,current:signal.price,stop:stop,peak:signal.price,opened:Date()))
+            trades.insert(.init(id:UUID(),symbol:signal.asset.symbol,side:"BUY",quantity:qty,price:signal.price,date:Date(),reason:"Ranked trend + dual momentum",pnl:nil),at:0)
+        }
+    }
+
+    private func sell(symbol:String, price:Double, reason:String) {
+        guard let i = positions.firstIndex(where: { $0.symbol == symbol }) else { return }
+        let p = positions[i]
+        let proceeds = p.quantity * price
+        let realized = (price - p.entry) * p.quantity
+        cash += proceeds
+        positions.remove(at:i)
+        trades.insert(.init(id:UUID(),symbol:symbol,side:"SELL",quantity:p.quantity,price:price,date:Date(),reason:reason,pnl:realized),at:0)
+    }
+
+    func reset() {
+        cash = settings.startingCash
+        positions = []
+        trades = []
+        scans = []
+    }
 }
