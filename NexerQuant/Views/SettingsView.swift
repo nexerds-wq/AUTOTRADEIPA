@@ -6,108 +6,29 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Live Market Data") {
-                    SecureField(
-                        "Twelve Data API key (optional)",
-                        text: $s.apiKey
-                    )
-
-                    Text(
-                        s.apiKey.isEmpty
-                        ? "No key: deterministic demo prices. Add a key for live/historical market data."
-                        : "API key configured."
-                    )
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Section("Automation") {
+                    Toggle("Automatic paper trading", isOn: $s.settings.autoEnabled)
+                    Text("The scanner ranks the full built-in stock and ETF universe using 12-month momentum, 6-month momentum, the 200-day trend, breakouts and volatility. The portfolio can hold the strongest qualifying assets instead of being locked to three symbols.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
-                Section("Momentum / Trend Core") {
-                    Stepper(
-                        "Momentum: \(s.settings.momentumMonths) months",
-                        value: $s.settings.momentumMonths,
-                        in: 3...18
-                    )
-
-                    Stepper(
-                        "Fast EMA: \(s.settings.fastMA)",
-                        value: $s.settings.fastMA,
-                        in: 10...100,
-                        step: 5
-                    )
-
-                    Stepper(
-                        "Slow EMA: \(s.settings.slowMA)",
-                        value: $s.settings.slowMA,
-                        in: 100...300,
-                        step: 10
-                    )
-
-                    Stepper(
-                        "Minimum score: \(s.settings.minimumScore)",
-                        value: $s.settings.minimumScore,
-                        in: 50...100,
-                        step: 5
-                    )
+                Section("Capital") {
+                    Text("Starting paper cash: $\(s.settings.startingCash, specifier:"%.0f")")
+                    Text("Position size is calculated from total portfolio value and the number of qualifying assets. It is not hard-coded to $1,000.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
-                Section("Risk") {
-                    Stepper(
-                        value: $s.settings.riskPct,
-                        in: 0.1...3.0,
-                        step: 0.1
-                    ) {
-                        Text(
-                            "Risk/trade: \(s.settings.riskPct, specifier: "%.1f")%"
-                        )
-                    }
-
-                    Stepper(
-                        value: $s.settings.maxPositionPct,
-                        in: 5...50,
-                        step: 5
-                    ) {
-                        Text(
-                            "Max position: \(s.settings.maxPositionPct, specifier: "%.0f")%"
-                        )
-                    }
-
-                    Stepper(
-                        "Max positions: \(s.settings.maxPositions)",
-                        value: $s.settings.maxPositions,
-                        in: 1...15
-                    )
-                }
-
-                Section("Confirmations") {
-                    Toggle(
-                        "RSI",
-                        isOn: $s.settings.useRSI
-                    )
-
-                    Toggle(
-                        "MACD",
-                        isOn: $s.settings.useMACD
-                    )
-
-                    Toggle(
-                        "ADX",
-                        isOn: $s.settings.useADX
-                    )
-
-                    Toggle(
-                        "Volume",
-                        isOn: $s.settings.useVolume
-                    )
+                Section("Data") {
+                    Text("Keyless daily market data")
+                    Text("No API key is required by the current market-data service.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 Section {
-                    Button(
-                        "Reset $10,000 Paper Account",
-                        role: .destructive
-                    ) {
-                        s.settings.startingCash = 10000
-                        s.reset()
-                    }
+                    Button("Reset Paper Account", role:.destructive) { s.reset() }
                 }
             }
             .navigationTitle("Strategy Lab")
