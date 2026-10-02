@@ -5,7 +5,9 @@ struct Asset: Identifiable, Codable, Hashable { let symbol:String; let name:Stri
 struct Position: Identifiable, Codable { let id:UUID; let symbol:String; var quantity:Double; var entry:Double; var current:Double; var stop:Double; let opened:Date; var value:Double { quantity*current }; var pnl:Double {(current-entry)*quantity} }
 struct Trade: Identifiable, Codable { let id:UUID; let symbol:String; let side:String; let quantity:Double; let price:Double; let date:Date; let reason:String }
 struct StrategySettings: Codable {
-    var autoEnabled=false; var startingCash=10000.0; var riskPct=0.5; var maxPositionPct=20.0; var maxPositions=5
+    var autoEnabled=false; var startingCash=10000.0
+    // Hard safety limits for the adaptive paper trader.
+    var riskPct=0.5; var minAdaptivePositionPct=5.0; var maxPositionPct=20.0; var maxPositions=10
     var momentumMonths=12; var fastMA=50; var slowMA=200; var minimumScore=80; var atrStop=2.0; var trailingATR=2.5
     var useRSI=true; var useMACD=true; var useADX=true; var useVolume=true
 }
