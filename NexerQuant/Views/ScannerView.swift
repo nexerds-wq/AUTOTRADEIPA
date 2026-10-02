@@ -7,7 +7,7 @@ struct ScannerView: View {
             ScrollView {
                 LazyVStack(spacing:12) {
                     if s.scans.isEmpty {
-                        ContentUnavailableView("No Research Scan Yet",systemImage:"scope",description:Text("Run a scan from Command Center to rank the available market signals."))
+                        ContentUnavailableView("No Research Scan Yet",systemImage:"scope",description:Text("Run a scan from Command Center to rank the market universe."))
                     } else {
                         ForEach(Array(s.scans.enumerated()),id:\.element.id) { index,x in
                             VStack(alignment:.leading,spacing:10) {
@@ -15,14 +15,21 @@ struct ScannerView: View {
                                     ZStack { Circle().fill(.thinMaterial).frame(width:42,height:42); Text("\(index+1)").font(.headline.bold()) }
                                     VStack(alignment:.leading){Text(x.asset.symbol).font(.title3.bold());Text(x.asset.name).font(.caption).foregroundStyle(.secondary)}
                                     Spacer()
-                                    Text("\(x.score)").font(.title.bold()).contentTransition(.numericText())
+                                    Text("\(x.score)").font(.title.bold())
                                 }
-                                HStack { chip(x.above200 ? "ABOVE 200D":"BELOW 200D"); chip(x.breakout ? "BREAKOUT":"NO BREAKOUT"); chip("VOL \(x.volatility,specifier:"%.1f")%") }
+                                HStack {
+                                    chip(x.above200 ? "ABOVE 200D":"BELOW 200D")
+                                    chip(x.breakout ? "BREAKOUT":"NO BREAKOUT")
+                                }
+                                HStack {
+                                    chip("12M \(String(format:"%.1f",x.momentum12))%")
+                                    chip("6M \(String(format:"%.1f",x.momentum6))%")
+                                    chip("VOL \(String(format:"%.1f",x.volatility))%")
+                                }
                                 Text(x.reason).font(.caption).foregroundStyle(.secondary)
-                                ProgressView(value:Double(x.score),total:100).tint(x.score>=80 ? .green : x.score>=60 ? .orange:.secondary)
+                                ProgressView(value:Double(x.score),total:100)
                             }
                             .padding().background(.thinMaterial,in:RoundedRectangle(cornerRadius:20))
-                            .transition(.move(edge:.bottom).combined(with:.opacity))
                         }
                     }
                 }.padding()
