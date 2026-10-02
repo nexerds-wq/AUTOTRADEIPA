@@ -16,6 +16,7 @@
   8957515E832A34BF4F499504 = {isa = PBXBuildFile; fileRef = C0A0E1E94F9BE724BDE8F449; };
   F30E0BB19ED79DA0555BE262 = {isa = PBXBuildFile; fileRef = 3230B60732D13141DDDF5F6A; };
   04200CFFD12D083534B07BB1 = {isa = PBXBuildFile; fileRef = 3685E330EC5277A9DD5661C6; };
+  A11A11A11A11A11A11A11A11 = {isa = PBXBuildFile; fileRef = B22B22B22B22B22B22B22B22; };
 /* End PBXBuildFile section */
 /* Begin PBXFileReference section */
   AFF703898C6FB14DB79AF686 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NexerQuantApp.swift; sourceTree = "<group>"; };
@@ -29,6 +30,7 @@
   C0A0E1E94F9BE724BDE8F449 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketDataService.swift; sourceTree = "<group>"; };
   3230B60732D13141DDDF5F6A = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
   3685E330EC5277A9DD5661C6 = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+  B22B22B22B22B22B22B22B22 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
   38A007151ABE87CC01A5B6E9 = {isa = PBXFileReference; explicitFileType = wrapper.application; path = NexerQuant.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
   7561BFB015D8F536760CB671 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
@@ -36,14 +38,14 @@
   03FE26E9D2B275B11B82B9A2 = {isa = PBXGroup; children = (3230B60732D13141DDDF5F6A); path = Models; sourceTree = "<group>"; };
   E8764D70B53FA9D06CBC14A9 = {isa = PBXGroup; children = (F1F63F79B26DB098939B8D7F,C0A0E1E94F9BE724BDE8F449); path = Services; sourceTree = "<group>"; };
   121BBCBF42974BB31BC56237 = {isa = PBXGroup; children = (7D1788BA64810CD11BA0CD9F); path = Utilities; sourceTree = "<group>"; };
-  E30B4F4A69D252D1867EE142 = {isa = PBXGroup; children = (38DD4429760BEDB0B356431C,491BBBB683DBEF9D3746E3E5,0C2926407AB0BE9322108B6A,B711BBBA2C3531390ACF510C,D4338D0CEF1BC06EC1F7B35E); path = Views; sourceTree = "<group>"; };
+  E30B4F4A69D252D1867EE142 = {isa = PBXGroup; children = (38DD4429760BEDB0B356431C,491BBBB683DBEF9D3746E3E5,0C2926407AB0BE9322108B6A,B711BBBA2C3531390ACF510C,D4338D0CEF1BC06EC1F7B35E,B22B22B22B22B22B22B22B22); path = Views; sourceTree = "<group>"; };
   B28B7AF69320201D1CF206EB = {isa = PBXGroup; children = (AFF703898C6FB14DB79AF686,03FE26E9D2B275B11B82B9A2,E8764D70B53FA9D06CBC14A9,121BBCBF42974BB31BC56237,E30B4F4A69D252D1867EE142,3685E330EC5277A9DD5661C6,FBDC4F23F93125BBEEAE800C); path = NexerQuant; sourceTree = "<group>"; };
   FBDC4F23F93125BBEEAE800C = {isa = PBXGroup; children = (38A007151ABE87CC01A5B6E9); name = Products; sourceTree = "<group>"; };
 /* End PBXGroup section */
   0E8A3AD980EC179856012B7E = {isa = PBXNativeTarget; buildConfigurationList = 011485B2EE57B7D61ACA51C9; buildPhases = (BCE16DD0260827ECF338C787,7561BFB015D8F536760CB671,0189424A5A60FED329FA868E); buildRules = (); dependencies = (); name = NexerQuant; productName = NexerQuant; productReference = 38A007151ABE87CC01A5B6E9; productType = "com.apple.product-type.application"; };
   98F54143AB4E86B28C3AFEE0 = {isa = PBXProject; attributes = {LastSwiftUpdateCheck = 2600; LastUpgradeCheck = 2600; TargetAttributes = {0E8A3AD980EC179856012B7E = {CreatedOnToolsVersion = 26.0; }; }; }; buildConfigurationList = 15FD5A6CB082B2EEE99CAC7F; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = B28B7AF69320201D1CF206EB; productRefGroup = FBDC4F23F93125BBEEAE800C; projectDirPath = ""; projectRoot = ""; targets = (0E8A3AD980EC179856012B7E); };
   0189424A5A60FED329FA868E = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (04200CFFD12D083534B07BB1); runOnlyForDeploymentPostprocessing = 0; };
-  BCE16DD0260827ECF338C787 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (8EC4556C78B6AD909BCCD42B,74FCF1421B76D83A09BBE09D,45D17A500CB2BACEB74E23F4,A8A987E350BDB3C9AB6680F3,E3F2E659D3239B7E37FF4C2B,7D1E36CA156B424F31A6BEA1,324169C8CAE494E1BC38C84C,5971278FCF393A2EAF4B01DC,8957515E832A34BF4F499504,F30E0BB19ED79DA0555BE262); runOnlyForDeploymentPostprocessing = 0; };
+  BCE16DD0260827ECF338C787 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (8EC4556C78B6AD909BCCD42B,74FCF1421B76D83A09BBE09D,45D17A500CB2BACEB74E23F4,A8A987E350BDB3C9AB6680F3,E3F2E659D3239B7E37FF4C2B,7D1E36CA156B424F31A6BEA1,324169C8CAE494E1BC38C84C,5971278FCF393A2EAF4B01DC,8957515E832A34BF4F499504,F30E0BB19ED79DA0555BE262,A11A11A11A11A11A11A11A11); runOnlyForDeploymentPostprocessing = 0; };
   E4CC03D48D772ABF5D72D504 = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = "Nexer Quant"; INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES; INFOPLIST_KEY_UILaunchScreen_Generation = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = com.nexer.quant; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; DEBUG_INFORMATION_FORMAT = dwarf; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };
   0BA094C68170D90CEF675522 = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = "Nexer Quant"; INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES; INFOPLIST_KEY_UILaunchScreen_Generation = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = com.nexer.quant; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; SWIFT_COMPILATION_MODE = wholemodule; SWIFT_OPTIMIZATION_LEVEL = "-O"; }; name = Release; };
   907DDA722B0009F522E6CC17 = {isa = XCBuildConfiguration; buildSettings = {CLANG_ENABLE_MODULES = YES; SDKROOT = iphoneos; }; name = Debug; };
